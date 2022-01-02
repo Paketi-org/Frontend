@@ -1,4 +1,4 @@
-var proxyAddr = "http://localhost:5003/narocniki";
+var proxyAddr = "http://34.149.11.70/";
 
 function loadPageAllUsers() {
 	var users = getUsers();
@@ -55,7 +55,7 @@ function addUser() {
 
 function getUsers() {
 	var request = new XMLHttpRequest();
-	request.open("GET", proxyAddr, false);
+	request.open("GET", proxyAddr + "narocniki/", false);
 	request.setRequestHeader("Access-Control-Allow-Origin", "*")
 	request.send(null);
 	if (request.readyState == 4 && request.status == 200) {
@@ -68,7 +68,7 @@ function getUsers() {
 
 function getUser(userId) {
 	var request = new XMLHttpRequest();
-	request.open("GET", proxyAddr + '/' + userId, false);
+	request.open("GET", proxyAddr + 'narocniki/' + userId, false);
 	request.send(null);
 	if (request.readyState == 4 && request.status == 200) {
 		return JSON.parse(request.responseText);
