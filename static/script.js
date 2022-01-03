@@ -80,7 +80,7 @@ function getUser(userId) {
 
 function deleteUser(userId) {
 	var request = new XMLHttpRequest();
-	request.open("DELETE", proxyAddr + '/' + userId, false);
+	request.open("DELETE", proxyAddr + 'narocniki/' + userId, false);
 	request.send(null);
 	loadPageAllUsers();
 }
