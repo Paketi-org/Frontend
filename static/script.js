@@ -38,7 +38,7 @@ function describeUser() {
 
 function addUser() {
 	var request = new XMLHttpRequest();
-	request.open("POST", proxyAddr, false);
+	request.open("POST", proxyAddr + "narocniki", false);
 	request.setRequestHeader("Content-Type", "application/json");
 
 	uporabnisko_ime = document.getElementById("uname").value
@@ -55,7 +55,7 @@ function addUser() {
 
 function getUsers() {
 	var request = new XMLHttpRequest();
-	request.open("GET", proxyAddr + "narocniki/", false);
+	request.open("GET", proxyAddr + "narocniki", false);
 	request.setRequestHeader("Access-Control-Allow-Origin", "*")
 	request.send(null);
 	if (request.readyState == 4 && request.status == 200) {
