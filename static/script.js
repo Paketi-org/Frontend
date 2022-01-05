@@ -96,6 +96,12 @@ function loadPageAllPrevozi() {
 		mainContent += "<p> -------------------------------------------</p>";
 		mainContent += "<p> Od kje:" + prevozi["prevozi"][i]["od_lokacije"] + "</p>";
 		mainContent += "<p> Do kje: " + prevozi["prevozi"][i]["do_lokacije"] + "</p>";
+		mainContent += "<p> Start: " + prevozi["prevozi"][i]["cas_odhoda"] + "</p>";
+		mainContent += "<p> Pricakovano trajanje: " + prevozi["prevozi"][i]["cas_prihoda"] + "</p>";
+		mainContent += '<form action=\"javascript:addAktivniPrevoz('+ prevozi["prevozi"][i]["id_prevoza"] + ",\'abaupid" + i + "\');\">"
+		mainContent += '<label for="abaupid">Stranka:</label><br>'
+  		mainContent += '<input type="text" id="abaupid' + i + '" name="abaupid" value=\"42\"><br><br>'
+ 		mainContent += '<input type="submit" value="Aktiviraj"></input></form>'
 		mainContent += "<p><a href=\"javascript:deletePrevoz(" + prevozi["prevozi"][i]["id_prevoza"] + ");\">Zbrisi</a>";
 		mainContent += "<p><a href=\"/static/voznik.html?id=" + prevozi["prevozi"][i]["id_prevoza"] + "\" ;\">Podrobnosti</a>";
 		mainContent += "<p> -------------------------------------------</p>";
@@ -118,6 +124,8 @@ function describePrevoz() {
 	mainContent += "<p> Do kje: " + prevoz["do_lokacije"] + "</p>";
 	mainContent += "<p> Uporabnik_prevoza: " + prevoz["uporabnik_prevoza"] + "</p>";
 	mainContent += "<p> Prevoznik: " + prevoz["prevoznik"] + "</p>";
+	mainContent += "<p> Start: " + prevoz["cas_odhoda"] + "</p>";
+	mainContent += "<p> Pricakovano trajanje: " + prevoz["cas_prihoda"] + "</p>";
 	mainContent += "<p> Status: " + prevoz["status"] + "</p>";
 	mainContent += "<p> Strosek: " + prevoz["strosek"] + "</p>";
 	document.getElementById("main_prevoz").innerHTML = mainContent;
@@ -128,15 +136,17 @@ function addPrevoz() {
 	request.open("POST", proxyAddr + "ponujeni_prevozi", false);
 	request.setRequestHeader("Content-Type", "application/json");
 
-	prevoznik = int(document.getElementById("prevoznik").value);
-	uporabnik_prevoza = int(document.getElementById("upprevoza").value);
+	prevoznik = parseInt(document.getElementById("prevoznik").value);
+	uporabnik_prevoza = -1;
 	od_kje = document.getElementById("odkje").value;
 	do_kje = document.getElementById("dokje").value;
-	strosek = int(document.getElementById("strosek").value);
+	strosek = parseInt(document.getElementById("strosek").value);
 	id_prevoza = Math.floor(Math.random() * 10000);
 	prevoz_status = "na voljo";
-	var prevoz = {id_prevoza: id_prevoza, prevoznik: prevoznik, uporabnik_prevoza: uporabnik_prevoza, od_lokacije: od_kje, do_lokacije: do_kje, status: prevoz_status, strosek: strosek, cas_odhoda: "20:20"};
+	start = document.getElementById("start").value;
+	var prevoz = {id_prevoza: id_prevoza, prevoznik: prevoznik, uporabnik_prevoza: uporabnik_prevoza, od_lokacije: od_kje, do_lokacije: do_kje, status: prevoz_status, strosek: strosek, cas_odhoda: start};
 	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
 	loadPageAllPrevozi();
 }
 
@@ -169,7 +179,7 @@ function deletePrevoz(prevozId) {
 	var request = new XMLHttpRequest();
 	request.open("DELETE", proxyAddr + 'ponujeni_prevozi/' + prevozId, false);
 	request.send(null);
-	loadPageAllUsers();
+	loadPageAllPrevozi();
 }
 
 
@@ -225,5 +235,243 @@ function deletePlacilo(userId) {
 	var request = new XMLHttpRequest();
 	request.open("DELETE", proxyAddr + 'placila/' + userId, false);
 	request.send(null);
-	loadPageAllUsers();
+	loadPageAllPlacila();
+}
+
+// Vsi iskani prevozi
+// Prevozi
+function loadPageAllIskaniPrevozi() {
+	var prevozi = getIskaniPrevozi();
+	var mainContent = "";
+	
+	mainContent += "<div><h2>Vsi iskani prevozi</h2>";
+	console.log(prevozi);
+	for (var i = 0; i < prevozi["prevozi"].length; i++) {
+		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> Od kje:" + prevozi["prevozi"][i]["od_lokacije"] + "</p>";
+		mainContent += "<p> Do kje: " + prevozi["prevozi"][i]["do_lokacije"] + "</p>";
+		mainContent += "<p><a href=\"javascript:deleteIskanPrevoz(" + prevozi["prevozi"][i]["id_prevoza"] + ");\">Zbrisi</a>";
+		mainContent += "<p><a href=\"/static/iskan.html?id=" + prevozi["prevozi"][i]["id_prevoza"] + "\" ;\">Podrobnosti</a>";		
+		mainContent += "<p> -------------------------------------------</p>";
+	}
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
+}
+
+
+function addIskanPrevoz() {
+	var request = new XMLHttpRequest();
+	request.open("POST", proxyAddr + "iskani_prevozi", false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	prevoznik = -1;
+	uporabnik_prevoza = parseInt(document.getElementById("pupprevoza").value);
+	od_kje = document.getElementById("podkje").value;
+	do_kje = document.getElementById("pdokje").value;
+	strosek = parseInt(document.getElementById("pstrosek").value);
+	id_prevoza = Math.floor(Math.random() * 10000);
+	prevoz_status = "na voljo";
+	var prevoz = {id_prevoza: id_prevoza, prevoznik: prevoznik, uporabnik_prevoza: uporabnik_prevoza, od_lokacije: od_kje, do_lokacije: do_kje, status: prevoz_status, strosek: strosek, cas_odhoda: "20:20"};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	loadPageAllIskaniPrevozi();
+}
+
+function getIskaniPrevozi() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "iskani_prevozi", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function getIskanPrevoz(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + 'iskani_prevozi/' + prevozId, false);
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function describeIskanPrevoz() {
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+	mainContent = ""
+	prevoz = getIskanPrevoz(id)
+	console.log(prevoz)
+	mainContent += "<p> Od kje:" + prevoz["od_lokacije"] + "</p>";
+	mainContent += "<p> Do kje: " + prevoz["do_lokacije"] + "</p>";
+	mainContent += "<p> Stranka: " + prevoz["uporabnik_prevoza"] + "</p>";
+	mainContent += "<p> Status: " + prevoz["status"] + "</p>";
+	mainContent += "<p> Strosek: " + prevoz["strosek"] + "</p>";
+	document.getElementById("main_prevoz").innerHTML = mainContent;
+}
+
+function deleteIskanPrevoz(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("DELETE", proxyAddr + 'iskani_prevozi/' + prevozId, false);
+	request.send(null);
+	loadPageAllIskaniPrevozi();
+}
+//################################################
+
+function loadPageAllOcene() {
+	var prevozi = getOcene();
+	var mainContent = "";
+	
+	mainContent += "<div><h2>Ocene aplikacije</h2>";
+	console.log(prevozi);
+	for (var i = 0; i < prevozi["ocene"].length; i++) {
+		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> Ime uporabnika:" + prevozi["ocene"][i]["ime"] + "</p>";
+		mainContent += "<p> Ocena: " + prevozi["ocene"][i]["ocena"] + "</p>";
+		mainContent += "<p><a href=\"javascript:deleteOcena(" + prevozi["ocene"][i]["id"] + ");\">Zbrisi</a>";	
+		mainContent += "<p> -------------------------------------------</p>";
+	}
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
+}
+
+
+function addOcena() {
+	var request = new XMLHttpRequest();
+	request.open("POST", proxyAddr + "ocene", false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	id_uporabnika = parseInt(document.getElementById("uporabnikid").value);
+	ocena = document.getElementById("ocena").value;
+	id = Math.floor(Math.random() * 10000);
+	var ocena = {id_uporabnika: id_uporabnika, ocena: ocena, id: id};
+	request.send(JSON.stringify(ocena));
+	console.log(JSON.stringify(ocena));
+	loadPageAllOcene();
+}
+
+function getOcene() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "ocene", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+
+function deleteOcena(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("DELETE", proxyAddr + 'ocene/' + prevozId, false);
+	request.send(null);
+	loadPageAllOcene();
+}
+
+//################################################################
+
+function loadPageAllAktivniPrevozi() {
+	var prevozi = getAktivniPrevozi();
+	var mainContent = "";
+	
+	mainContent += "<div><h2>Vsi aktivni prevozi</h2>";
+	console.log(prevozi);
+	for (var i = 0; i < prevozi["prevozi"].length; i++) {
+		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> Od kje:" + prevozi["prevozi"][i]["od_lokacije"] + "</p>";
+		mainContent += "<p> Do kje: " + prevozi["prevozi"][i]["do_lokacije"] + "</p>";
+		mainContent += "<p> Start: " + prevozi["prevozi"][i]["cas_odhoda"] + "</p>";
+		mainContent += "<p> Pricakovano trajanje: " + prevozi["prevozi"][i]["cas_prihoda"] + "</p>";
+		mainContent += "<p><a href=\"javascript:deleteAktivniPrevoz(" + prevozi["prevozi"][i]["id_prevoza"] + ");\">Zbrisi</a>";
+		mainContent += "<p><a href=\"/static/aktivniprevoz.html?id=" + prevozi["prevozi"][i]["id_prevoza"] + "\" ;\">Podrobnosti</a>";
+		mainContent += "<p> -------------------------------------------</p>";
+	}
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
+}
+
+function describeAktivniPrevoz() {
+	console.log("Pozdravljena zvezda!")
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+	mainContent = ""
+	prevoz = getAktivniPrevoz(id)
+	console.log(prevoz)
+	mainContent += "<p> Od kje:" + prevoz["od_lokacije"] + "</p>";
+	mainContent += "<p> Do kje: " + prevoz["do_lokacije"] + "</p>";
+	mainContent += "<p> Uporabnik_prevoza: " + prevoz["uporabnik_prevoza"] + "</p>";
+	mainContent += "<p> Prevoznik: " + prevoz["prevoznik"] + "</p>";
+	mainContent += "<p> Start: " + prevoz["cas_odhoda"] + "</p>";
+	mainContent += "<p> Pricakovano trajanje: " + prevoz["cas_prihoda"] + "</p>";
+	mainContent += "<p> Status: " + prevoz["status"] + "</p>";
+	mainContent += "<p> Trenutna lokacija: " + prevoz["trenutna_lokacija"] + "</p>";
+	mainContent += "<p> Odpremljeno: " + prevoz["odpremljeno"] + "</p>";
+	mainContent += "<p> Prejeto: " + prevoz["prejeto"] + "</p>";
+	mainContent += "<p> Strosek: " + prevoz["strosek"] + "</p>";
+	document.getElementById("main_prevoz").innerHTML = mainContent;
+}
+
+function addAktivniPrevoz(id_prevoza, id_uporabnika) {
+	var request = new XMLHttpRequest();
+	request.open("POST", proxyAddr + "aktivni_prevozi", false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	id_prevoza = id_prevoza
+	vir = "ponujeni";
+	console.log("Hej")
+	console.log(id_uporabnika)
+	uporabnik_prevoza = parseInt(document.getElementById(id_uporabnika).value);
+	var prevoz = {id_prevoza: id_prevoza, vir:vir, uporabnik_prevoza:uporabnik_prevoza};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	loadPageAllPrevozi();
+}
+
+function getAktivniPrevozi() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "aktivni_prevozi", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function getAktivniPrevoz(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + 'aktivni_prevozi/' + prevozId, false);
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function deleteAktivniPrevoz(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("DELETE", proxyAddr + 'aktivni_prevozi/' + prevozId, false);
+	request.send(null);
+	loadPageAllAktivniPrevozi();
 }
