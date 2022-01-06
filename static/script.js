@@ -147,6 +147,12 @@ function addPrevoz() {
 	var prevoz = {id_prevoza: id_prevoza, prevoznik: prevoznik, uporabnik_prevoza: uporabnik_prevoza, od_lokacije: od_kje, do_lokacije: do_kje, status: prevoz_status, strosek: strosek, cas_odhoda: start};
 	request.send(JSON.stringify(prevoz));
 	console.log(JSON.stringify(prevoz));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
 	loadPageAllPrevozi();
 }
 
@@ -276,6 +282,12 @@ function addIskanPrevoz() {
 	var prevoz = {id_prevoza: id_prevoza, prevoznik: prevoznik, uporabnik_prevoza: uporabnik_prevoza, od_lokacije: od_kje, do_lokacije: do_kje, status: prevoz_status, strosek: strosek, cas_odhoda: "20:20"};
 	request.send(JSON.stringify(prevoz));
 	console.log(JSON.stringify(prevoz));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
 	loadPageAllIskaniPrevozi();
 }
 
@@ -441,7 +453,31 @@ function addAktivniPrevoz(id_prevoza, id_uporabnika) {
 	var prevoz = {id_prevoza: id_prevoza, vir:vir, uporabnik_prevoza:uporabnik_prevoza};
 	request.send(JSON.stringify(prevoz));
 	console.log(JSON.stringify(prevoz));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
 	loadPageAllPrevozi();
+}
+
+function spremeniAktivniPrevoz(){
+	var request = new XMLHttpRequest();
+
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+
+	request.open("PUT", proxyAddr + "aktivni_prevozi/" + id, false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	vir = "ponujeni";
+	vrednost = document.getElementById("trenutnalok").value
+	var prevoz = {atribut: "trenutna_lokacija", vrednost: vrednost};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	describeAktivniPrevoz();
 }
 
 function getAktivniPrevozi() {
