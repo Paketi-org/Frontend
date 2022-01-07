@@ -631,3 +631,32 @@ function loadPageAllLestvica() {
 
 	document.getElementById("main").innerHTML = mainContent;
 }
+
+function getSrecnik() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "loto", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function loadPageAllLoto() {
+	var prevozi = getSrecnik();
+	var mainContent = "";
+	
+	console.log(prevozi);
+	mainContent += "<p> -------------------------------------------</p>";
+	mainContent += "<p> Ime:" + prevozi["ime"] + "</p>";
+	mainContent += "<p> Priimek: " + prevozi["priimek"] + "</p>";
+	mainContent += "<p> Nagrada: " + prevozi["nagrada"] + "</p>";
+	mainContent += "<p> -------------------------------------------</p>";
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
+}
