@@ -397,6 +397,12 @@ function addOcena() {
 	var ocena = {id_uporabnika: id_uporabnika, ocena: ocena, id: id};
 	request.send(JSON.stringify(ocena));
 	console.log(JSON.stringify(ocena));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
 	loadPageAllOcene();
 }
 
@@ -593,4 +599,35 @@ function deleteAktivniPrevoz(prevozId) {
 	request.open("DELETE", proxyAddr + 'aktivni_prevozi/' + prevozId, false);
 	request.send(null);
 	loadPageAllAktivniPrevozi();
+}
+
+function getLestvica() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "lestvica", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function loadPageAllLestvica() {
+	var prevozi = getLestvica();
+	var mainContent = "";
+	
+	console.log(prevozi);
+	for (var i = 0; i < prevozi["narocniki"].length; i++) {
+		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> Ime uporabnika:" + prevozi["narocniki"][i]["ime"] + "</p>";
+		mainContent += "<p> Ocena: " + prevozi["narocniki"][i]["ocena"] + "</p>";
+		mainContent += "<p> Mesto: " + prevozi["narocniki"][i]["mesto"] + "</p>";
+		mainContent += "<p> -------------------------------------------</p>";
+	}
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
 }
