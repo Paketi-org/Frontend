@@ -660,3 +660,63 @@ function loadPageAllLoto() {
 
 	document.getElementById("main").innerHTML = mainContent;
 }
+
+function addPritozba() {
+	var request = new XMLHttpRequest();
+	request.open("POST", proxyAddr + "pritozbe", false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	id_vasuporabnika = parseInt(document.getElementById("vasuporabnikid").value);
+	id_gresuporabnika = parseInt(document.getElementById("gresuporabnikid").value);
+	ocena = document.getElementById("pritozba").value;
+	id = Math.floor(Math.random() * 10000);
+	var ocena = {id_uporabnika_vir: id_vasuporabnika, id_uporabnika_cilj: id_gresuporabnika, pritozba: ocena, id: id};
+	request.send(JSON.stringify(ocena));
+	console.log(JSON.stringify(ocena));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
+}
+
+function loadPageAllPritozbe() {
+	var prevozi = getPritozbe();
+	var mainContent = "";
+	
+	console.log(prevozi);
+	for (var i = 0; i < prevozi["pritozbe"].length; i++) {
+		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> Ime uporabnika, ki se pritozuje: " + prevozi["pritozbe"][i]["ime_vir"] + "</p>";
+		mainContent += "<p> Ime uporabnika, na katerega se pritozuje: " + prevozi["pritozbe"][i]["ime_cilj"] + "</p>";
+		mainContent += "<p> Pritozba: " + prevozi["pritozbe"][i]["pritozba"] + "</p>";
+		mainContent += "<p><a href=\"javascript:deletePritozba(" + prevozi["pritozbe"][i]["id"] + ");\">Zbrisi</a>";	
+		mainContent += "<p> -------------------------------------------</p>";
+	}
+	mainContent += "</div>";
+	
+
+	document.getElementById("main").innerHTML = mainContent;
+}
+
+
+function getPritozbe() {
+	var request = new XMLHttpRequest();
+	request.open("GET", proxyAddr + "pritozbe", false);
+	request.setRequestHeader("Access-Control-Allow-Origin", "*")
+	request.send(null);
+	if (request.readyState == 4 && request.status == 200) {
+		return JSON.parse(request.responseText);
+	}
+	else {
+		return null;
+	}
+}
+
+function deletePritozba(prevozId) {
+	var request = new XMLHttpRequest();
+	request.open("DELETE", proxyAddr + 'pritozbe/' + prevozId, false);
+	request.send(null);
+	loadPageAllOcene();
+}
