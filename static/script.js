@@ -718,5 +718,5 @@ function deletePritozba(prevozId) {
 	var request = new XMLHttpRequest();
 	request.open("DELETE", proxyAddr + 'pritozbe/' + prevozId, false);
 	request.send(null);
-	loadPageAllOcene();
+	loadPageAllPritozbe();
 }
