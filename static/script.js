@@ -29,11 +29,31 @@ function describeUser() {
 	mainContent = ""
 	user = getUser(id)
 	console.log(user)
-	mainContent += "<p> Ime:" + user["ime"] + "</p>";
+	mainContent += "<p> Ime: " + user["ime"] + "</p>";
 	mainContent += "<p> Priimek: " + user["priimek"] + "</p>";
 	mainContent += "<p> Uporabnisko ime: " + user["uporabnisko_ime"] + "</p>";
 	mainContent += "<p> Stevilka: " + user["telefonska_stevilka"] + "</p>";
+	if(user["ocena"] != -1){
+		mainContent += "<p> Ocena: " + user["ocena"] + "</p>";
+	}
 	document.getElementById("main_user").innerHTML = mainContent;
+}
+
+function spremeniUporabnika(){
+	var request = new XMLHttpRequest();
+
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+
+	request.open("PUT", proxyAddr + "narocniki/" + id, false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	vrednost = document.getElementById("userocena").value
+	var user = {atribut: "ocena", vrednost: vrednost};
+	request.send(JSON.stringify(user));
+	console.log(JSON.stringify(user));
+	describeUser();
 }
 
 function addUser() {
@@ -47,9 +67,15 @@ function addUser() {
 	telefonska_stevilka = document.getElementById("mnum").value
 	id = Math.floor(Math.random() * 10000)
 	console.log("Pozdravljena zvezda!")
-	var user = {ime: ime, priimek: priimek, id: id, uporabnisko_ime: uporabnisko_ime, telefonska_stevilka: telefonska_stevilka};
+	var user = {ime: ime, priimek: priimek, id: id, uporabnisko_ime: uporabnisko_ime, telefonska_stevilka: telefonska_stevilka, ocena: -1};
 	console.log(user)
 	request.send(JSON.stringify(user));
+	if(request.status != 201){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
 	loadPageAllUsers();
 }
 
@@ -198,6 +224,7 @@ function loadPageAllPlacila() {
 	console.log(placila);
 	for (var i = 0; i < placila["placila"].length; i++) {
 		mainContent += "<p> -------------------------------------------</p>";
+		mainContent += "<p> ID placila:" + placila["placila"][i]["id"] + "</p>";
 		mainContent += "<p> ID prejemnika:" + placila["placila"][i]["id_placnika"] + "</p>";
 		mainContent += "<p> ID placnika: " + placila["placila"][i]["id_prejemnika"] + "</p>";
 		mainContent += "<p> Znesek: " + placila["placila"][i]["znesek_eur"] + "</p>";
@@ -478,6 +505,62 @@ function spremeniAktivniPrevoz(){
 	request.send(JSON.stringify(prevoz));
 	console.log(JSON.stringify(prevoz));
 	describeAktivniPrevoz();
+}
+
+function prejmiAktivniPrevoz(){
+	var request = new XMLHttpRequest();
+
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+
+	request.open("PUT", proxyAddr + "aktivni_prevozi/" + id, false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	var prevoz = {atribut: "prejeto", vrednost: "Da"};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	describeAktivniPrevoz();
+}
+
+function odpremiAktivniPrevoz(){
+	var request = new XMLHttpRequest();
+
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+
+	request.open("PUT", proxyAddr + "aktivni_prevozi/" + id, false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	var prevoz = {atribut: "odpremljeno", vrednost: "Da"};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	describeAktivniPrevoz();
+}
+
+function placajAktivniPrevoz(){
+	var request = new XMLHttpRequest();
+
+	var url_string = window.location.href
+	var url = new URL(url_string);
+	var id = url.searchParams.get("id");
+
+	request.open("PUT", proxyAddr + "placila/" + id, false);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	var prevoz = {atribut: "status", vrednost: "placano"};
+	request.send(JSON.stringify(prevoz));
+	console.log(JSON.stringify(prevoz));
+	if(request.status != 200){
+		content = ""
+		content += "<p> Napaka: </p>";
+		content += "<p>" + request.response + "<\p>";
+		document.getElementById("napaka").innerHTML = content;
+	}
+	else{
+		window.location = ("/static/aktivniprevozi.html")
+	}
 }
 
 function getAktivniPrevozi() {
